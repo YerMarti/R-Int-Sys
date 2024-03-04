@@ -6,26 +6,31 @@
 
 # This function must return a list with the information needed to solve the problem.
 # (Depending on the problem, it should receive or not parameters)
-initialize.problem <- function(initial_pos=vec(1, 1),
-                               final_pos=vec(1, 1),
-                               map=matrix(0, nrow=1, ncol=1),
-                               cost_list=list()) {
+initialize.problem <- function(file, random = FALSE) {
   problem <- list() # Default value is an empty list.
   
-  ## TOASK - Cómo se inicializa el problema? Carga del fichero. Funciones eval y cost.
+  # Load CSV file
+  data <- load.from.csv("../data/multimodal-planner/map0.txt") # V1=y=row, V2=x=col
+  
+  problem$initial_pos <- c(data$V2[[2]], data$V1[[2]])
+  problem$final_pos <- c(data$V2[[3]], data$V1[[3]])
   
   # This attributes are compulsory
-  problem$name <- paste0("Multimodal Planner ( Initial position:", initial_pos, ", Final position:", final_pos, ")")
-  problem$state_initial <- list(actual_pos = initial_pos,
+  problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos, ", Final position:", problem$final_pos, ")")
+  problem$state_initial <- list(actual_pos = problem$initial_pos,
                                 time = 0, 
                                 cost = 0, 
                                 mode = "W") # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
-  problem$state_final <- final_pos
-  problem$actions_possible <- list("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest")
+  problem$state_final <- list(actual_pos = problem$final_pos,
+                              time = 0, 
+                              cost = 0, 
+                              mode = "W")
+  problem$actions_possible <- data.frame(list("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"), stringsAsFactors = FALSE)
   
   # You can add additional attributes
-  problem$map <- map # Matriz de listas de transportes (caminar es el default /lista vacia/)
-  problem$cost_list <- cost_list # costes de cada modo de transporte
+  problem$map <- matrix(list(), nrow = strtoi(data$V1[[1]]), ncol = strtoi(data$V2[[1]])) # Matriz de listas de transportes (caminar es el default /lista vacia/)
+  problem$time_cost_list <- list(w=strtoi(data$time_cost[[4]]), e=strtoi(data$time_cost[[5]])) # costes de tiempo cada modo de transporte
+  problem$cost_list <- list(w=strtoi(data$cost[[4]]), e=strtoi(data$cost[[5]])) # costes de cada modo de transporte
   
   return(problem)
 }
@@ -103,15 +108,21 @@ effect <- function (state, action, problem) {
          }
   )
   
+  switch(state$mode,
+         "W" = {
+           state$time <- state$time + problem$time_cost_list$w
+           state$cost <- state$cost + problem$cost_list$w
+         })
+  
   return(result)
 }
 
 # Analyzes if a state is final or not
-is.final.state <- function (state, final_satate, problem) {
+is.final.state <- function (state, final_state, problem) {
   result <- FALSE # Default value is FALSE.
   
   # <INSERT YOUR CODE HERE TO CHECK WHETHER A STATE IS FINAL OR NOT>
-  result <- (state == final_state)
+  result <- identical(state$actual_pos, final_state$actual_pos)
   
   return(result)
 }
@@ -134,4 +145,26 @@ get.evaluation <- function(state, problem) {
   # <INSERT YOUR CODE HERE TO RETURN THE RESULT OF THE EVALUATION FUNCTION>
   
 	return(1) # Default value is 1.
+}
+
+### LOAD MAP FROM CSV FUNCTION
+load.from.csv <- function(file) {
+  data <- read.csv(file ,header=FALSE) # Read a CSV file
+  
+  splitted_txt4 <- str_split(data$V1[[4]], ":")
+  values4 <- str_split(splitted_txt4[[1]][2], ";")
+  
+  splitted_txt5 <- str_split(data$V1[[5]], ":")
+  values5 <- str_split(splitted_txt5[[1]][2], ";")
+  
+  modes <- c(0, 0, 0, splitted_txt4[[1]][1], splitted_txt5[[1]][1])
+  data$mode <- modes
+  
+  time_costs <- c(0, 0, 0, values4[[1]][1], values5[[1]][1])
+  data$time_cost <- time_costs
+  
+  costs <- c(0, 0, 0, values4[[1]][2], values5[[1]][2])
+  data$cost <- costs
+  
+  return(data)
 }

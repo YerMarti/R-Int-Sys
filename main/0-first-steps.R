@@ -166,6 +166,7 @@ persons <- list(person1, person2)
 persons[[1]]$cities[1] # 1st city of the 1st person in the list
 
 data <- read.csv("C:\\Users\\Adrian\\Desktop\\R-workspace\\R-Int-Sys\\data\\multimodal-planner\\map0.txt",header=FALSE) # Read a CSV file
+data
 data$V1
 data[[1]][1]
 data$V2[1]
