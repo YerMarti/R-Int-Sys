@@ -8,23 +8,24 @@
 # (Depending on the problem, it should receive or not parameters)
 initialize.problem <- function(initial_pos=vec(1, 1),
                                final_pos=vec(1, 1),
-                               map=matrix(0, nrow=1, ncol=1)) {
+                               map=matrix(0, nrow=1, ncol=1),
+                               cost_list=list()) {
   problem <- list() # Default value is an empty list.
   
-  ## TO ASK - Cómo se inicializa el problema? Carga del fichero. Funciones eval y cost.
+  ## TOASK - Cómo se inicializa el problema? Carga del fichero. Funciones eval y cost.
   
   # This attributes are compulsory
   problem$name <- paste0("Multimodal Planner ( Initial position:", initial_pos, ", Final position:", final_pos, ")")
-  problem$state_initial <- initial_pos
+  problem$state_initial <- list(actual_pos = initial_pos,
+                                time = 0, 
+                                cost = 0, 
+                                mode = "W") # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
   problem$state_final <- final_pos
   problem$actions_possible <- list("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest")
   
   # You can add additional attributes
-  problem$map <- map
-  problem$actual_pos <- initial_pos # Positions are managed as (x, y) coordinates
-  problem$time <- 0
-  problem$cost <- 0
-  problem$mode <- "W" # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
+  problem$map <- map # Matriz de listas de transportes (caminar es el default /lista vacia/)
+  problem$cost_list <- cost_list # costes de cada modo de transporte
   
   return(problem)
 }
@@ -36,28 +37,28 @@ is.applicable <- function (state, action, problem) {
   # <INSERT CODE HERE TO CHECK THE APPLICABILITY OF EACH ACTION>
   switch(action,
          "north" = {
-           return(actual_pos[2] > 1)
+           return(state$actual_pos[2] > 1)
          },
          "northeast" = {
-           return(actual_pos[2] > 1) && (actual_pos[1] < ncol(map))
+           return(state$actual_pos[2] > 1) && (state$actual_pos[1] < ncol(problem$map))
          },
          "east" = {
-           return (actual_pos[1] < ncol(map))
+           return (state$actual_pos[1] < ncol(problem$map))
          },
          "southeast" = {
-           return(actual_pos[2] < nrow(map)) && (actual_pos[1] < ncol(map))
+           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] < ncol(problem$map))
          },
          "south" = {
-           return(actual_pos[2] < nrow(map))
+           return(state$actual_pos[2] < nrow(problem$map))
          },
          "southwest" = {
-           return(actual_pos[2] < nrow(map)) && (actual_pos[1] > 1)
+           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] > 1)
          },
          "west" = {
-           return(actual_pos[1] > 1)
+           return(state$actual_pos[1] > 1)
          },
          "northwest" = {
-           return(actual_pos[2] > 1) && (actual_pos[1] > 1)
+           return(state$actual_pos[2] > 1) && (state$actual_pos[1] > 1)
          },
          
          return(FALSE)
@@ -73,32 +74,32 @@ effect <- function (state, action, problem) {
   # <INSERT YOUR CODE HERE TO MODIFY CURRENT STATE>
   switch(action,
          "north" = {
-           actual_pos[2] <- actual_pos[2] - 1
+           state$actual_pos[2] <- state$actual_pos[2] - 1
          },
          "northeast" = {
-           actual_pos[2] <- actual_pos[2] - 1
-           actual_pos[1] <- actual_pos[1] + 1
+           state$actual_pos[2] <- state$actual_pos[2] - 1
+           state$actual_pos[1] <- state$actual_pos[1] + 1
          },
          "east" = {
-           actual_pos[1] <- actual_pos[1] + 1
+           state$actual_pos[1] <- state$actual_pos[1] + 1
          },
          "southeast" = {
-           actual_pos[2] <- actual_pos[2] + 1
-           actual_pos[1] <- actual_pos[1] + 1
+           state$actual_pos[2] <- state$actual_pos[2] + 1
+           state$actual_pos[1] <- state$actual_pos[1] + 1
          },
          "south" = {
-           actual_pos[2] <- actual_pos[2] + 1
+           state$actual_pos[2] <- state$actual_pos[2] + 1
          },
          "southwest" = {
-           actual_pos[2] <- actual_pos[2] + 1
-           actual_pos[1] <- actual_pos[1] - 1
+           state$actual_pos[2] <- state$actual_pos[2] + 1
+           state$actual_pos[1] <- state$actual_pos[1] - 1
          },
          "west" = {
-           actual_pos[1] <- actual_pos[1] - 1
+           state$actual_pos[1] <- state$actual_pos[1] - 1
          },
          "northwest" = {
-           actual_pos[2] <- actual_pos[2] - 1
-           actual_pos[1] <- actual_pos[1] - 1
+           state$actual_pos[2] <- state$actual_pos[2] - 1
+           state$actual_pos[1] <- state$actual_pos[1] - 1
          }
   )
   
@@ -118,7 +119,7 @@ is.final.state <- function (state, final_satate, problem) {
 # Transforms a state into a string
 to.string = function (state, problem) {
   # <INSERT YOUR CODE HERE TO GENERATE A STRING THAT REPRESENTS THE STATE>
-  return(paste0("Actual State ( Actual position:", problem$actual_pos, ", Final position:", problem$final_pos, "Time spent:", problem$time, "Actual mode:", problem$mode, "Cost sum:", problem$cost, " )"))
+  return(paste0("Actual State ( Actual position:", state$actual_pos, ", Final position:", problem$final_pos, "Time spent:", state$time, "Actual mode:", state$mode, "Cost sum:", state$cost, " )"))
 }
 
 # Returns the cost of applying an action over a state
