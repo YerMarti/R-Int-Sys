@@ -25,7 +25,7 @@ initialize.problem <- function(file, random = FALSE) {
                               time = 0, 
                               cost = 0, 
                               mode = "W")
-  problem$actions_possible <- data.frame(list("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"), stringsAsFactors = FALSE)
+  problem$actions_possible <- data.frame(c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"), stringsAsFactors = FALSE)
   
   # You can add additional attributes
   problem$map <- matrix(list(), nrow = strtoi(data$V1[[1]]), ncol = strtoi(data$V2[[1]])) # Matriz de listas de transportes (caminar es el default /lista vacia/)
@@ -38,10 +38,12 @@ initialize.problem <- function(file, random = FALSE) {
 # Analyzes if an action can be applied in the received state.
 is.applicable <- function (state, action, problem) {
   result <- FALSE # Default value is FALSE.
+  print(action[1])
   
   # <INSERT CODE HERE TO CHECK THE APPLICABILITY OF EACH ACTION>
   switch(action,
          "north" = {
+           print(paste0(state$actual_pos[2]))
            return(state$actual_pos[2] > 1)
          },
          "northeast" = {
@@ -219,3 +221,4 @@ load.from.csv.v2 <- function(file){
               df = df))
   print(df)
 }
+
