@@ -10,7 +10,9 @@ initialize.problem <- function(file, random = FALSE) {
   problem <- list() # Default value is an empty list.
   
   # Load CSV file
-  data <- load.from.csv("../data/multimodal-planner/map0.txt") # V1=y=row, V2=x=col
+  data <- load.from.csv.v2("../data/multimodal-planner/map0.txt")
+  map <- data$map
+  map
   
   problem$initial_pos <- c(data$V2[[2]], data$V1[[2]])
   problem$final_pos <- c(data$V2[[3]], data$V1[[3]])
@@ -180,16 +182,18 @@ load.from.csv.v2 <- function(file){
   rows <- as.integer(map_dimensions[1])
   cols <- as.integer(map_dimensions[2])
   
-  initial_pos <- as.integer(strsplit(file_content[2], ",")[[1]])
-  final_pos <- as.integer(strsplit(file_content[3], ",")[[1]])
+  initial_pos <- c(as.integer(strsplit(file_content[2], ",")[[1]][[1]]), as.integer(strsplit(file_content[2], ",")[[1]][[2]]))
+  final_pos <- c(as.integer(strsplit(file_content[3], ",")[[1]][[1]]), as.integer(strsplit(file_content[3], ",")[[1]][[2]]))
   
   # Creating an empty data frame
   df <- data.frame(
     mode = character(),
     time_cost = integer(),
-    money_cost = double(),
-    stops_list = I(list())
+    money_cost = double()
   )
+  
+  # Create map
+  map = matrix(list(), nrow = rows, ncol = cols)
   
   # Parsing each line and adding it to the data frame
   for (i in 4:length(file_content)) {
@@ -197,28 +201,31 @@ load.from.csv.v2 <- function(file){
     parts <- strsplit(line, ";")[[1]]
     
     mode <- substr(parts[1], 1, 1)
-    time_cost <- as.integer(substr(parts[1], 3, nchar(parts[1])))
+    time_cost <- as.double(substr(parts[1], 3, nchar(parts[1])))
     money_cost <- as.double(parts[2])
     
-    # Check if stops_list is present
-    stops_list <- ifelse(length(parts) > 2, strsplit(parts[3], ";")[[1]], character(0))
-    
-    # Convert stops_list to a list of vectors (Aquí hay error)
-    stops_list <- if(length(stops_list) > 0) {
-      lapply(stops_list, function(x) as.integer(strsplit(x, ",")[[1]]))
-    } else {
-      list()
+    if (length(parts) > 2) {
+      for (j in 3:length(parts)) {
+        station_name <- paste0(mode, as.character(j - 2))
+        station_pos <- c(as.integer(strsplit(parts[j], ",")[[1]][[1]]), as.integer(strsplit(parts[j], ",")[[1]][[2]]))
+        print(station_pos)
+        map[[station_pos[2]]][[station_pos[1]]] <- append(map[[station_pos[2]]][[station_pos[1]]], station_name)
+        print(map[[station_pos[2]]][[station_pos[1]]])
+        print(j)
+      }
     }
     
-    df <- rbind(df, data.frame(mode, time_cost, money_cost, stops_list))
+    #print(map)
+    
+    df <- rbind(df, data.frame(mode, time_cost, money_cost))
   }
   
   # Return the data
-  return(list(rows = rows,
-              cols = cols,
-              initial_pos = initial_pos,
+  return(list(initial_pos = initial_pos,
               final_pos = final_pos,
+              map = map,
               df = df))
-  print(df)
 }
 
+# Debugg
+data <- load.from.csv.v2("../data/multimodal-planner/map4.txt")
