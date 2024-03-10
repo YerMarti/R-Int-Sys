@@ -206,12 +206,15 @@ load.from.csv.v2 <- function(file){
     
     if (length(parts) > 2) {
       for (j in 3:length(parts)) {
-        station_name <- paste0(mode, as.character(j - 2))
+        print("-----------")
+        print(paste0("Iteration: ", j))
+        station_list <- list(name = mode, number = as.character(j - 2))
         station_pos <- c(as.integer(strsplit(parts[j], ",")[[1]][[1]]), as.integer(strsplit(parts[j], ",")[[1]][[2]]))
-        print(station_pos)
-        map[[station_pos[2]]][[station_pos[1]]] <- append(map[[station_pos[2]]][[station_pos[1]]], station_name)
+        print(paste0("Station pos (x, y): ", station_pos[1], ", ", station_pos[2]))
+        map[[station_pos[2]]][[station_pos[1]]] <- append(map[[station_pos[2]]][[station_pos[1]]], station_list)
         print(map[[station_pos[2]]][[station_pos[1]]])
-        print(j)
+        print("Map:")
+        print(map)
       }
     }
     
