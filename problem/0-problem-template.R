@@ -211,12 +211,9 @@ load.from.csv.v2 <- function(file){
         station_list <- list(name = mode, number = as.character(j - 2))
         station_pos <- c(as.integer(strsplit(parts[j], ",")[[1]][[1]]), as.integer(strsplit(parts[j], ",")[[1]][[2]]))
         print(paste0("Station pos (x, y): ", station_pos[1], ", ", station_pos[2]))
-        map[[station_pos[2]]][[station_pos[1]]][[1]] <- append(map[[station_pos[2]]][[station_pos[1]]], station_list)
-        print(map[[station_pos[2]]][[station_pos[1]]])
+        map[station_pos[2], station_pos[1]][[1]] <- append(map[station_pos[2], station_pos[1]][[1]], station_list)
+        print(map[station_pos[2], station_pos[1]][[1]])
       }
-      
-      print("-----------")
-      print(map)
     }
     
     df <- rbind(df, data.frame(mode, time_cost, money_cost))
@@ -231,3 +228,7 @@ load.from.csv.v2 <- function(file){
 
 # Debugg
 data <- load.from.csv.v2("../data/multimodal-planner/map4.txt")
+
+print(data$map)
+
+print(data$map[8, 5][[1]][[3]])
