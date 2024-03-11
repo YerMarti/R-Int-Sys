@@ -171,3 +171,24 @@ data$V1
 data[[1]][1]
 data$V2[1]
 
+x <- c(1:5) 
+x <- c(x, M=1)
+x
+rm(x)
+
+x[1]<-assign(c("a","b","c","d","e"),1:5)
+x
+
+
+vector <- c(1, 2, 3, 4, 5)
+mode <- "M"
+
+# Asignar el nombre "M" a la primera posición del vector
+names(vector)[1] <- mode
+
+
+vector
+# Acceder a la primera posición del vector usando la variable "mode"
+valor <- vector[[mode]]
+
+print(valor) # Salida: 1
