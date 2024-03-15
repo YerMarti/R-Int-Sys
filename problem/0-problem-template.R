@@ -7,11 +7,11 @@
 # This function must return a list with the information needed to solve the problem.
 # (Depending on the problem, it should receive or not parameters)
 initialize.problem <- function(file, random = FALSE) {
-  # # TESTING
-  # rm(list=ls())
-  # cat("\014")
-  # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-  # file <- "../data/multimodal-planner/map0.txt"
+  # TESTING
+  rm(list=ls())
+  cat("\014")
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  file <- "../data/multimodal-planner/map0.txt"
   
   problem <- list() # Default value is an empty list.
   
@@ -27,13 +27,21 @@ initialize.problem <- function(file, random = FALSE) {
   problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos, ", Final position:", problem$final_pos, ")")
   problem$state_initial <- list(actual_pos = problem$initial_pos,
                                 time = 0, 
-                                cost = 0, 
+                                money = 0, 
                                 mode = "W") # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
   problem$state_final <- list(actual_pos = problem$final_pos,
                               time = 0, 
-                              cost = 0, 
+                              money = 0, 
                               mode = "W")
-  problem$actions_possible <- data.frame(c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest", "ew"), stringsAsFactors = FALSE)
+  #problem$actions_possible <- data.frame(c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"), stringsAsFactors = FALSE)
+  problem$actions_possible <- c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest") # ASK: Se queda así hasta que funcione DataFrame
+  
+  for (i in 1:nrow(problem$transport)) {
+    if (problem$transport$mode[[i]] != "E") {
+      new_action <- paste0("X", problem$transport$mode[[i]])
+      problem$actions_possible <- append(problem$actions_possible, new_action)
+    }
+  }
   
   # You can add additional attributes
   #problem$map <- matrix(list(), nrow = strtoi(data$V1[[1]]), ncol = strtoi(data$V2[[1]])) # Matriz de listas de transportes (caminar es el default /lista vacia/)
@@ -50,6 +58,11 @@ is.applicable <- function (state, action, problem) {
   # <INSERT CODE HERE TO CHECK THE APPLICABILITY OF EACH ACTION>
   switch(action,
          "north" = {
+           num_station <- problem$map[state$actual_pos[2]-1, state$actual_pos[1]]
+           num_station <- problem$map[2-1, 2]$M[2] # ASK: Cómo acceder a la lista de estaciones dinámicamente
+           actual_num_station <- problem$map[2, 2][[1]][2]
+           print(num_station)
+           is_consecutive <- (num_station == actual_num_station + 1) | (num_station == actual_num_station - 1)
            return(state$actual_pos[2] > 1)
          },
          "northeast" = {
@@ -73,11 +86,9 @@ is.applicable <- function (state, action, problem) {
          "northwest" = {
            return(state$actual_pos[2] > 1) && (state$actual_pos[1] > 1)
          },
-         "ew" = {
-           if (state$mode != "W") {
-             return(TRUE)
-           }
-         },
+         if (strsplit(action, "X")[[1]][2] != state$mode) {
+           return(TRUE)
+         }
          
          return(FALSE)
   )
@@ -119,10 +130,13 @@ effect <- function (state, action, problem) {
            state$actual_pos[2] <- state$actual_pos[2] - 1
            state$actual_pos[1] <- state$actual_pos[1] - 1
          },
-         "ew" = {
-           state$mode <- "W"
-           idx <- which(problem$transport$mode == "W")
+         if (strsplit(action, "X")[[1]][2] != state$mode) {
+           new_mode <- strsplit(action, "X")[[1]][2]
+           state$mode <- new_mode
+           idx <- which(problem$transport$mode == new_mode)
            state$time <- state$time + problem$transport$time_cost[idx]
+           # ASK: Cómo llevar el conteo de billetes de transporte (lista, vector... no se)
+           state$money <- state$money + problem$transport$money_cost[idx]
          }
   )
   
@@ -142,7 +156,7 @@ is.final.state <- function (state, final_state, problem) {
 # Transforms a state into a string
 to.string = function (state, problem) {
   # <INSERT YOUR CODE HERE TO GENERATE A STRING THAT REPRESENTS THE STATE>
-  return(paste0("Actual State ( Actual position:", state$actual_pos, ", Final position:", problem$final_pos, "Time spent:", state$time, "Actual mode:", state$mode, "Cost sum:", state$cost, " )"))
+  return(paste0("Actual State ( Actual position:", state$actual_pos, ", Final position:", problem$final_pos, "Time spent:", state$time, "Actual mode:", state$mode, "Money sum:", state$money, " )"))
 }
 
 # Returns the cost of applying an action over a state
@@ -193,7 +207,7 @@ load.from.csv <- function(file){
     
     if (length(parts) > 2) {
       for (j in 3:length(parts)) {
-        station_list <- list(name = mode, number = as.character(j - 2))
+        station_list <- list(name = mode, number = j - 2)
         station_pos <- c(as.integer(strsplit(parts[j], ",")[[1]][[1]]), as.integer(strsplit(parts[j], ",")[[1]][[2]]))
         map[station_pos[2], station_pos[1]][[1]] <- append(map[station_pos[2], station_pos[1]][[1]], station_list)
       }

@@ -182,6 +182,7 @@ x
 
 vector <- c(1, 2, 3, 4, 5)
 mode <- "M"
+append(vector, "6")
 
 # Asignar el nombre "M" a la primera posición del vector
 names(vector)[1] <- mode
@@ -192,3 +193,7 @@ vector
 valor <- vector[[mode]]
 
 print(valor) # Salida: 1
+
+action <- "XW"
+
+a <- strsplit(action, "X")[[1]]
