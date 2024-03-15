@@ -58,11 +58,6 @@ solve.problem <- function(file, random = FALSE) {
   kable_material(kbl(results, caption = problem$name), c("striped", "hover", "condensed", "responsive"))
 }
 
-rm(list=ls())
-cat("\014")
-file <- "../data/multimodal-planner/map0.txt";
-
-# Testings
-test_problem <- initialize.problem(file, FALSE)
+file <- "../data/multimodal-planner/map4.txt";
 
 solve.problem(file, TRUE)
