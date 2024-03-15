@@ -192,3 +192,6 @@ vector
 valor <- vector[[mode]]
 
 print(valor) # Salida: 1
+
+z <- c(4, 6, 2, 8, 10, 2, 6)
+which(z==6)
