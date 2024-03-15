@@ -194,6 +194,11 @@ valor <- vector[[mode]]
 
 print(valor) # Salida: 1
 
+<<<<<<< HEAD
 action <- "XW"
 
 a <- strsplit(action, "X")[[1]]
+=======
+z <- c(4, 6, 2, 8, 10, 2, 6)
+which(z==6)
+>>>>>>> 04fadbad5b05c83e5ee0a30ccac3c9c2f796750c
