@@ -21,34 +21,48 @@ initialize.problem <- function(file, random = FALSE) {
   problem$initial_pos <- c(data$initial_pos[[1]], data$initial_pos[[2]]) # (x, y)
   problem$final_pos <- c(data$final_pos[[1]], data$final_pos[[2]]) # (x, y)
   problem$map <- data$map
-  problem$transport <- data$df
+  problem$transport <- data$df  # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
+  
+  vec_temp <- c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest")
+  transports_used <- c()
+  
+  for (i in 1:nrow(problem$transport)) {
+    if (problem$transport$mode[[i]] != "E") {
+      new_action <- paste0("X", problem$transport$mode[[i]])
+      vec_temp <- append(vec_temp, new_action)
+      transports_used <- append(transports_used, list(name = problem$transport$mode[[i]], value = 0))
+    }
+  }
+  
+  problem$actions_possible <- data.frame(actions = vec_temp, stringsAsFactors = FALSE)
   
   # This attributes are compulsory
   problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos, ", Final position:", problem$final_pos, ")")
   problem$state_initial <- list(actual_pos = problem$initial_pos,
                                 time = 0, 
                                 money = 0, 
-                                mode = "W") # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
+                                mode = "W",
+                                transports_used = transports_used)
   problem$state_final <- list(actual_pos = problem$final_pos,
                               time = 0, 
                               money = 0, 
-                              mode = "W")
-  #problem$actions_possible <- data.frame(c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"), stringsAsFactors = FALSE)
-  problem$actions_possible <- c("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest") # ASK: Se queda así hasta que funcione DataFrame
-  
-  for (i in 1:nrow(problem$transport)) {
-    if (problem$transport$mode[[i]] != "E") {
-      new_action <- paste0("X", problem$transport$mode[[i]])
-      problem$actions_possible <- append(problem$actions_possible, new_action)
-    }
-  }
-  
-  # You can add additional attributes
-  #problem$map <- matrix(list(), nrow = strtoi(data$V1[[1]]), ncol = strtoi(data$V2[[1]])) # Matriz de listas de transportes (caminar es el default /lista vacia/)
-  #problem$time_cost_list <- list(w=strtoi(data$time_cost[[4]]), e=strtoi(data$time_cost[[5]])) # costes de tiempo cada modo de transporte
-  #problem$cost_list <- list(w=strtoi(data$cost[[4]]), e=strtoi(data$cost[[5]])) # costes de cada modo de transporte
+                              mode = "W",
+                              transports_used = transports_used)
   
   return(problem)
+}
+
+# Factorized code for checking if two stations are consecutive
+is.consecutive <- function (actual_pos, next_pos, state, problem) {
+  idx <- which(problem$map[next_pos[2], next_pos[1]] == state$mode)
+  if (idx.isNull() && state$mode != "W") {
+    return(FALSE)
+  }
+  actual_num_station <- problem$map[actual_pos[2], actual_pos[1]][[1]][idx]
+  idx <- which(problem$map[actual_pos[2], actual_pos[1]] == problem$mode)
+  next_num_station <- problem$map[next_pos[2], next_pos[1]][[1]][idx]
+  is_consecutive <- (next_num_station == actual_num_station + 1) || (next_num_station == actual_num_station - 1)
+  return (is_consecutive)
 }
 
 # Analyzes if an action can be applied in the received state.
@@ -58,39 +72,57 @@ is.applicable <- function (state, action, problem) {
   # <INSERT CODE HERE TO CHECK THE APPLICABILITY OF EACH ACTION>
   switch(action,
          "north" = {
-           num_station <- problem$map[state$actual_pos[2]-1, state$actual_pos[1]]
-           num_station <- problem$map[2-1, 2]$M[2] # ASK: Cómo acceder a la lista de estaciones dinámicamente
-           actual_num_station <- problem$map[2, 2][[1]][2]
-           print(num_station)
-           is_consecutive <- (num_station == actual_num_station + 1) | (num_station == actual_num_station - 1)
-           return(state$actual_pos[2] > 1)
+           next_pos <- state$actual_pos
+           next_pos[2] <- next_pos[2] - 1
+           return (actual_pos[2] > 1) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "northeast" = {
-           return(state$actual_pos[2] > 1) && (state$actual_pos[1] < ncol(problem$map))
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] + 1
+           next_pos[2] <- next_pos[2] - 1
+           return(state$actual_pos[2] > 1) && (state$actual_pos[1] < ncol(problem$map)) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "east" = {
-           return (state$actual_pos[1] < ncol(problem$map))
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] + 1
+           return (state$actual_pos[1] < ncol(problem$map)) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "southeast" = {
-           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] < ncol(problem$map))
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] + 1
+           next_pos[2] <- next_pos[2] + 1
+           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] < ncol(problem$map)) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "south" = {
-           return(state$actual_pos[2] < nrow(problem$map))
+           next_pos <- state$actual_pos
+           next_pos[2] <- next_pos[2] + 1
+           return(state$actual_pos[2] < nrow(problem$map)) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "southwest" = {
-           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] > 1)
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] - 1
+           next_pos[2] <- next_pos[2] + 1
+           return(state$actual_pos[2] < nrow(problem$map)) && (state$actual_pos[1] > 1) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "west" = {
-           return(state$actual_pos[1] > 1)
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] - 1
+           return(state$actual_pos[1] > 1) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
          "northwest" = {
-           return(state$actual_pos[2] > 1) && (state$actual_pos[1] > 1)
+           next_pos <- state$actual_pos
+           next_pos[1] <- next_pos[1] - 1
+           next_pos[2] <- next_pos[2] - 1
+           return(state$actual_pos[2] > 1) && (state$actual_pos[1] > 1) && (is.consecutive(state$actual_pos, next_pos, state, problem))
          },
-         if (strsplit(action, "X")[[1]][2] != state$mode) {
-           return(TRUE)
-         }
-         
-         return(FALSE)
+         {
+           new_mode <- strsplit(action, "X")[[1]][2]
+           if (new_mode != state$mode) {
+             idx <- which(problem$map[state$actual_pos[2], state$actual_pos[1]] == state$mode)
+             return (!idx.isNull() || new_mode == "W")
+           }
+           return (FALSE) 
+          }
   )
   
   return(result)
@@ -130,7 +162,7 @@ effect <- function (state, action, problem) {
            state$actual_pos[2] <- state$actual_pos[2] - 1
            state$actual_pos[1] <- state$actual_pos[1] - 1
          },
-         if (strsplit(action, "X")[[1]][2] != state$mode) {
+         {
            new_mode <- strsplit(action, "X")[[1]][2]
            state$mode <- new_mode
            idx <- which(problem$transport$mode == new_mode)
