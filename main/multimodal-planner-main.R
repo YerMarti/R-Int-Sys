@@ -58,6 +58,15 @@ solve.problem <- function(file, random = FALSE) {
   kable_material(kbl(results, caption = problem$name), c("striped", "hover", "condensed", "responsive"))
 }
 
+# zona testing
+problem <- initialize.problem("../data/multimodal-planner/map4.txt", TRUE)
+state <- problem$initial_state
+print(state$actual_pos)
+a <- is.applicable(state, "north", problem)
+print(state$actual_pos)
+a
+
+
 file <- "../data/multimodal-planner/map4.txt";
 
 solve.problem(file, TRUE)
