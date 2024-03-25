@@ -60,12 +60,31 @@ solve.problem <- function(file, random = FALSE) {
 
 # zona testing
 problem <- initialize.problem("../data/multimodal-planner/map4.txt", TRUE)
-state <- problem$initial_state
+state <- problem$state_initial
 print(state$actual_pos)
-a <- is.applicable(state, "north", problem)
-print(state$actual_pos)
+action <- "north"
+a <- is.applicable(state, action, problem)
 a
+state <- effect(state, action, problem)
+state <- effect(state, action, problem)
+state <- effect(state, action, problem)
+print(state$actual_pos)
 
+action <- "XM"
+a <- is.applicable(state, action, problem)
+a
+state <- effect(state, action, problem)
+print(state$actual_pos)
+print(state$mode)
+
+action <- "north"
+a <- is.applicable(state, action, problem)
+a
+state <- effect(state, action, problem)
+print(state$actual_pos)
+print(state$mode)
+
+############
 
 file <- "../data/multimodal-planner/map4.txt";
 

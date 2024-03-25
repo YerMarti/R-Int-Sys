@@ -19,6 +19,7 @@ initialize.problem <- function(file, random = FALSE) {
   data <- load.from.csv(file)
   
   problem$initial_pos <- c(data$initial_pos[[1]], data$initial_pos[[2]]) # (x, y)
+  print(problem$initial_pos)
   problem$final_pos <- c(data$final_pos[[1]], data$final_pos[[2]]) # (x, y)
   problem$map <- data$map
   problem$transport <- data$df  # Default value is "W" (Walking), "M" (Metro), "B" (Bus), "T" (Tram)
@@ -54,14 +55,17 @@ initialize.problem <- function(file, random = FALSE) {
 
 # Factorized code for checking if two stations are consecutive
 is.consecutive <- function (actual_pos, next_pos, state, problem) {
-  idx <- which(problem$map[next_pos[2], next_pos[1]] == state$mode)
-  print(idx)
-  if ((is.null(idx)) & (state$mode != "W")) { # comparar idx que sea 0
-    return(FALSE)
-  }
-  actual_num_station <- problem$map[actual_pos[2], actual_pos[1]][[1]][idx]
-  idx <- which(problem$map[actual_pos[2], actual_pos[1]] == problem$mode)
-  next_num_station <- problem$map[next_pos[2], next_pos[1]][[1]][idx]
+  next_idx <- which(problem$map[next_pos[2], next_pos[1]][[1]] == state$mode)
+  
+  if (length(next_idx) == 0 & state$mode != "W") # TODO
+    return (FALSE)
+  print(paste0("state$mode=", state$mode))
+  if (state$mode == "W")
+    return (TRUE)
+  
+  idx <- which(problem$map[actual_pos[2], actual_pos[1]][[1]] == state$mode)
+  actual_num_station <- as.integer(problem$map[actual_pos[2], actual_pos[1]][[1]][idx+1])
+  next_num_station <- as.integer(problem$map[next_pos[2], next_pos[1]][[1]][next_idx+1])
   is_consecutive <- (next_num_station == actual_num_station + 1) | (next_num_station == actual_num_station - 1)
   return (is_consecutive)
 }
@@ -92,7 +96,7 @@ is.applicable <- function (state, action, problem) {
            next_pos <- state$actual_pos
            next_pos[1] <- next_pos[1] + 1
            next_pos[2] <- next_pos[2] + 1
-           return(state$actual_pos[2] < nrow(problem$map)) & (state$actual_pos[1] < ncol(problem$map)) & (is.consecutive(state$actual_pos, next_pos, state, problem))
+           return((state$actual_pos[2] < nrow(problem$map)) & (state$actual_pos[1] < ncol(problem$map)) & (is.consecutive(state$actual_pos, next_pos, state, problem)))
          },
          "south" = {
            next_pos <- state$actual_pos
@@ -119,8 +123,13 @@ is.applicable <- function (state, action, problem) {
          {
            new_mode <- strsplit(action, "X")[[1]][2]
            if (new_mode != state$mode) {
-             idx <- which(problem$map[state$actual_pos[2], state$actual_pos[1]] == state$mode)
-             return (!is.null(idx) | new_mode == "W")
+             idx <- which(problem$map[state$actual_pos[2], state$actual_pos[1]][[1]] == new_mode)
+             print(idx)
+             if (new_mode == "W")
+               return (TRUE)
+             if (length(idx) == 0)
+               return (FALSE)
+             return (TRUE)
            }
            return (FALSE) 
           }
@@ -131,7 +140,6 @@ is.applicable <- function (state, action, problem) {
 
 # Returns the state resulting on applying the action over the state
 effect <- function (state, action, problem) {
-  result <- state # Default value is the current state.
   
   # <INSERT YOUR CODE HERE TO MODIFY CURRENT STATE>
   switch(action,
@@ -173,7 +181,7 @@ effect <- function (state, action, problem) {
          }
   )
   
-  return(result)
+  return(state)
 }
 
 # Analyzes if a state is final or not
