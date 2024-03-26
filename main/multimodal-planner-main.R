@@ -58,34 +58,37 @@ solve.problem <- function(file, random = FALSE) {
   kable_material(kbl(results, caption = problem$name), c("striped", "hover", "condensed", "responsive"))
 }
 
-# zona testing
-problem <- initialize.problem("../data/multimodal-planner/map4.txt", TRUE)
-state <- problem$state_initial
-print(state$actual_pos)
-action <- "north"
-a <- is.applicable(state, action, problem)
-a
-state <- effect(state, action, problem)
-state <- effect(state, action, problem)
-state <- effect(state, action, problem)
-print(state$actual_pos)
-
-action <- "XM"
-a <- is.applicable(state, action, problem)
-a
-state <- effect(state, action, problem)
-print(state$actual_pos)
-print(state$mode)
-
-action <- "north"
-a <- is.applicable(state, action, problem)
-a
-state <- effect(state, action, problem)
-print(state$actual_pos)
-print(state$mode)
+# # zona testing
+# problem <- initialize.problem("../data/multimodal-planner/map4.txt", TRUE)
+# state <- problem$state_initial
+# print(state$actual_pos)
+# action <- "east"
+# a <- is.applicable(state, action, problem)
+# a
+# state <- effect(state, action, problem)
+# state <- effect(state, action, problem)
+# state <- effect(state, action, problem)
+# state <- effect(state, action, problem)
+# state <- effect(state, action, problem)
+# print(state$actual_pos)
+# 
+# action <- "XW"
+# a <- is.applicable(state, action, problem)
+# a
+# state <- effect(state, action, problem)
+# print(state$actual_pos)
+# print(state$mode)
+# 
+# action <- "east"
+# a <- is.applicable(state, action, problem)
+# a
+# state <- effect(state, action, problem)
+# print(state$actual_pos)
+# print(state$mode)
 
 ############
 
-file <- "../data/multimodal-planner/map4.txt";
+file <- "../data/multimodal-planner/map0.txt";
 
 solve.problem(file, TRUE)
+
