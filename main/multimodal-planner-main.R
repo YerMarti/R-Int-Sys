@@ -43,8 +43,8 @@ solve.problem <- function(file, random = FALSE) {
   ucs_gs   <- uniform.cost.search(problem, max_iterations = 2500, count_print = 1000, graph_search = TRUE)
   gbfs_ts  <- greedy.best.first.search(problem, max_iterations = 2500, count_print = 1000)
   gbfs_gs  <- greedy.best.first.search(problem, max_iterations = 2500, count_print = 1000, graph_search = TRUE)
-  a_star_gs <- a.star.search(problem, max_iterations = 2500, count_print = 1000)
-  a_star_ts <- a.star.search(problem, max_iterations = 2500, count_print = 1000, graph_search = TRUE)
+  a_star_ts <- a.star.search(problem, max_iterations = 2500, count_print = 1000)
+  a_star_gs <- a.star.search(problem, max_iterations = 2500, count_print = 1000, graph_search = TRUE)
   
   results <- analyze.results(list(bfs_ts, bfs_gs, 
                                   dfs_ts, dfs_gs, 
@@ -52,14 +52,14 @@ solve.problem <- function(file, random = FALSE) {
                                   ids_ts, ids_gs,
                                   ucs_ts, ucs_gs,
                                   gbfs_ts, gbfs_gs,
-                                  a_star_gs, a_star_ts), problem)
+                                  a_star_ts, a_star_gs), problem)
   
   # Print results in an HTML Table
   kable_material(kbl(results, caption = problem$name), c("striped", "hover", "condensed", "responsive"))
 }
 
 # # zona testing
-# problem <- initialize.problem("../data/multimodal-planner/map4.txt", TRUE)
+# problem <- initialize.problem("../data/multimodal-planner/map0.txt", TRUE)
 # state <- problem$state_initial
 # print(state$actual_pos)
 # action <- "east"
@@ -79,12 +79,15 @@ solve.problem <- function(file, random = FALSE) {
 # print(state$actual_pos)
 # print(state$mode)
 # 
-# action <- "east"
+# action <- "north"
 # a <- is.applicable(state, action, problem)
 # a
 # state <- effect(state, action, problem)
 # print(state$actual_pos)
 # print(state$mode)
+# final <- is.final.state(state, state, problem)
+# final
+# problem$final_pos
 
 ############
 

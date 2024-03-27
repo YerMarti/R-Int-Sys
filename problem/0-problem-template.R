@@ -64,18 +64,12 @@ is.consecutive <- function (actual_pos, next_pos, state, problem) {
   actual_num_station <- as.integer(problem$map[actual_pos[2], actual_pos[1]][[1]][idx+1])
   next_num_station <- as.integer(problem$map[next_pos[2], next_pos[1]][[1]][next_idx+1])
   is_consecutive <- ((next_num_station == actual_num_station + 1) | (next_num_station == actual_num_station - 1))
-  print(paste0("IsConsecutive: ", is_consecutive))
-  print(paste0("Add pos: ", (next_num_station == actual_num_station + 1)))
-  print(paste0("Sub pos: ", (next_num_station == actual_num_station - 1)))
   return (is_consecutive)
 }
 
 # Analyzes if an action can be applied in the received state.
 is.applicable <- function (state, action, problem) {
   result <- FALSE # Default value is FALSE.
-  
-  print(paste0("------------ Action: ", action))
-  print(paste0("Actual pos: ", state$actual_pos[1], "-", state$actual_pos[2]))
   
   # <INSERT CODE HERE TO CHECK THE APPLICABILITY OF EACH ACTION>
   switch(action,
@@ -201,15 +195,15 @@ is.final.state <- function (state, final_state, problem) {
   result <- FALSE # Default value is FALSE.
   
   # <INSERT YOUR CODE HERE TO CHECK WHETHER A STATE IS FINAL OR NOT>
-  result <- identical(state$actual_pos, final_state$actual_pos)
+  result <- ((state$actual_pos[1] == problem$final_pos[1]) & (state$actual_pos[2] == problem$final_pos[2]))
   
   return(result)
 }
 
 # Transforms a state into a string
-to.string = function (state, problem) {
+to.string = function (state, problem=NULL) {
   # <INSERT YOUR CODE HERE TO GENERATE A STRING THAT REPRESENTS THE STATE>
-  return(paste0("Actual State ( Actual position:", state$actual_pos, ", Final position:", problem$final_pos, "Time spent:", state$time, "Actual mode:", state$mode, "Money sum:", state$money, " )"))
+  return(paste0("Actual State ( Actual position: ", state$actual_pos, " | Time spent: ", state$time, " | Actual mode: ", state$mode, " | Money sum: ", state$money, " )"))
 }
 
 # Returns the cost of applying an action over a state
@@ -229,7 +223,7 @@ get.evaluation <- function(state, problem) {
 ### LOAD MAP FROM CSV FUNCTION
 load.from.csv <- function(file){
   # Read the content of the file
-  file_content <- readLines("../data/multimodal-planner/map4.txt")
+  file_content <- readLines(file)
   
   # Extracting rows, cols, initial_pos, and final_pos
   map_dimensions <- strsplit(file_content[1], ",")[[1]]
