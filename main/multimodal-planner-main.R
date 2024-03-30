@@ -91,7 +91,7 @@ solve.problem <- function(file, random = FALSE) {
 
 ############
 
-file <- "../data/multimodal-planner/map0.txt";
+file <- "../data/multimodal-planner/map4.txt";
 
 solve.problem(file, TRUE)
 

@@ -32,7 +32,7 @@ initialize.problem <- function(file, random = FALSE) {
   problem$actions_possible <- data.frame(actions = vec_temp, stringsAsFactors = FALSE)
   
   # This attributes are compulsory
-  problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos, ", Final position:", problem$final_pos, ")")
+  problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos[[1]], ",", problem$initial_pos[[2]], " | Final position:", problem$final_pos[[1]], ",", problem$final_pos[[2]], " )")
   problem$state_initial <- list(actual_pos = problem$initial_pos,
                                 time = 0, 
                                 money = 0, 
@@ -146,6 +146,7 @@ is.applicable <- function (state, action, problem) {
 
 # Returns the state resulting on applying the action over the state
 effect <- function (state, action, problem) {
+  ex_action <- FALSE
   
   # <INSERT YOUR CODE HERE TO MODIFY CURRENT STATE>
   switch(action,
@@ -180,12 +181,19 @@ effect <- function (state, action, problem) {
          {
            new_mode <- strsplit(action, "X")[[1]][2]
            state$mode <- new_mode
-           idx <- which(problem$transport$mode == new_mode)
+           idx <- which(problem$transport$mode == "E")
            state$time <- state$time + problem$transport$time_cost[idx]
            # ASK: Cómo llevar el conteo de billetes de transporte (lista, vector... no se)
            state$money <- state$money + problem$transport$money_cost[idx]
+           
+           ex_action <- TRUE
          }
   )
+  
+  if (ex_action == FALSE){
+    idx <- which(problem$transport$mode == state$mode)
+    state$time <- state$time + problem$transport$time_cost[idx]
+  }
   
   return(state)
 }
@@ -203,7 +211,7 @@ is.final.state <- function (state, final_state, problem) {
 # Transforms a state into a string
 to.string = function (state, problem=NULL) {
   # <INSERT YOUR CODE HERE TO GENERATE A STRING THAT REPRESENTS THE STATE>
-  return(paste0("Actual State ( Actual position: ", state$actual_pos, " | Time spent: ", state$time, " | Actual mode: ", state$mode, " | Money sum: ", state$money, " )"))
+  return(paste0("Actual State ( Actual position: ", state$actual_pos[[1]], ",", state$actual_pos[[2]], " | Time spent: ", state$time, " | Actual mode: ", state$mode, " | Money sum: ", state$money, " )"))
 }
 
 # Returns the cost of applying an action over a state
@@ -216,8 +224,9 @@ get.cost <- function (action, state, problem) {
 # Heuristic function used by Informed Search Algorithms
 get.evaluation <- function(state, problem) {
   # <INSERT YOUR CODE HERE TO RETURN THE RESULT OF THE EVALUATION FUNCTION>
+  return (sqrt(sum((state$actual_pos - problem$final_pos)^2)))
   
-	return(1) # Default value is 1.
+	#return(1) # Default value is 1.
 }
 
 ### LOAD MAP FROM CSV FUNCTION
