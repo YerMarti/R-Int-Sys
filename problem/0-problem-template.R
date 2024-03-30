@@ -32,7 +32,7 @@ initialize.problem <- function(file, random = FALSE) {
   problem$actions_possible <- data.frame(actions = vec_temp, stringsAsFactors = FALSE)
   
   # This attributes are compulsory
-  problem$name <- paste0("Multimodal Planner ( Initial position:", problem$initial_pos[[1]], ",", problem$initial_pos[[2]], " | Final position:", problem$final_pos[[1]], ",", problem$final_pos[[2]], " )")
+  problem$name <- paste0("Multimodal Planner ( File: ", file, " | Initial position:", problem$initial_pos[[1]], ",", problem$initial_pos[[2]], " | Final position:", problem$final_pos[[1]], ",", problem$final_pos[[2]], " )")
   problem$state_initial <- list(actual_pos = problem$initial_pos,
                                 time = 0, 
                                 money = 0, 
@@ -179,14 +179,23 @@ effect <- function (state, action, problem) {
            state$actual_pos[1] <- state$actual_pos[1] - 1
          },
          {
+           ex_action <- TRUE
+           
            new_mode <- strsplit(action, "X")[[1]][2]
            state$mode <- new_mode
            idx <- which(problem$transport$mode == "E")
            state$time <- state$time + problem$transport$time_cost[idx]
-           # ASK: Cómo llevar el conteo de billetes de transporte (lista, vector... no se)
-           state$money <- state$money + problem$transport$money_cost[idx]
            
-           ex_action <- TRUE
+           if (new_mode == "W"){
+             return(state)
+           }
+           
+           idx <- which(state$transports_used == new_mode)
+           if (state$transports_used[idx+1] == 0){
+             state$transports_used[idx+1] <- 1
+             idx <- which(problem$transport$mode == new_mode)
+             state$money <- state$money + problem$transport$money_cost[idx]
+           }
          }
   )
   
@@ -217,16 +226,22 @@ to.string = function (state, problem=NULL) {
 # Returns the cost of applying an action over a state
 get.cost <- function (action, state, problem) {
   # <INSERT YOUR CODE HERE TO RETURN THE COST OF APPLYING THE ACTION ON THE STATE>
-  
-  return(1) # Default value is 1.
+  new_mode <- strsplit(action, "X")[[1]][2]
+
+  if (!is.na(new_mode)){
+    idx <- which(problem$transport$mode == state$mode)
+    return(problem$transport$time_cost[idx])
+  }
+
+  idx <- which(problem$transport$mode == "E")
+
+  return(problem$transport$time_cost[idx])
 }
 
 # Heuristic function used by Informed Search Algorithms
 get.evaluation <- function(state, problem) {
   # <INSERT YOUR CODE HERE TO RETURN THE RESULT OF THE EVALUATION FUNCTION>
   return (sqrt(sum((state$actual_pos - problem$final_pos)^2)))
-  
-	#return(1) # Default value is 1.
 }
 
 ### LOAD MAP FROM CSV FUNCTION

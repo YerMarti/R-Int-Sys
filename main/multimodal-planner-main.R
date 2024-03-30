@@ -58,11 +58,13 @@ solve.problem <- function(file, random = FALSE) {
   kable_material(kbl(results, caption = problem$name), c("striped", "hover", "condensed", "responsive"))
 }
 
-# # zona testing
-# problem <- initialize.problem("../data/multimodal-planner/map0.txt", TRUE)
+# zona testing
+# problem <- initialize.problem("../data/multimodal-planner/map1.txt", TRUE)
 # state <- problem$state_initial
 # print(state$actual_pos)
-# action <- "east"
+# action <- "south"
+# get.cost(action, state, problem)
+# problem$transport$time_cost
 # a <- is.applicable(state, action, problem)
 # a
 # state <- effect(state, action, problem)
@@ -72,12 +74,14 @@ solve.problem <- function(file, random = FALSE) {
 # state <- effect(state, action, problem)
 # print(state$actual_pos)
 # 
-# action <- "XW"
+# action <- "XB"
 # a <- is.applicable(state, action, problem)
 # a
 # state <- effect(state, action, problem)
 # print(state$actual_pos)
 # print(state$mode)
+# print(state$money)
+# print(state$transports_used)
 # 
 # action <- "north"
 # a <- is.applicable(state, action, problem)
@@ -91,7 +95,7 @@ solve.problem <- function(file, random = FALSE) {
 
 ############
 
-file <- "../data/multimodal-planner/map4.txt";
+file <- "../data/multimodal-planner/map0.txt";
 
 solve.problem(file, TRUE)
 
