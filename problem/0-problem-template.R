@@ -29,6 +29,8 @@ initialize.problem <- function(file, random = FALSE) {
     }
   }
   
+  problem$min_cost <- min(problem$transport$time_cost)
+  
   problem$actions_possible <- data.frame(actions = vec_temp, stringsAsFactors = FALSE)
   
   # This attributes are compulsory
@@ -241,7 +243,7 @@ get.cost <- function (action, state, problem) {
 # Heuristic function used by Informed Search Algorithms
 get.evaluation <- function(state, problem) {
   # <INSERT YOUR CODE HERE TO RETURN THE RESULT OF THE EVALUATION FUNCTION>
-  return (sqrt(sum((state$actual_pos - problem$final_pos)^2)))
+  return (sqrt(sum((state$actual_pos - problem$final_pos)^2)) * problem$min_cost)
 }
 
 ### LOAD MAP FROM CSV FUNCTION
