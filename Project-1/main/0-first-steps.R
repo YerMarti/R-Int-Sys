@@ -204,3 +204,32 @@ which(z==6)
 vec <- c()
 vec <- c(vec, "a")
 vec
+
+vec <- list(1, 3, 2)
+vec <- unlist(vec)
+a <- vec[vec %% 2 == 0]
+a
+
+l <- 1:1000
+sum(l[l %% 3 == 0 | l %% 5 == 0])
+
+# Num aleatorio
+a <- sample(vec, 1)
+a
+
+
+rm(list = ls()) # Clear Environment
+cat("\014")     # Clear Console
+graphics.off()  # Clear Plots
+
+
+nodo1 <- list(eval = 1, cost = 2)
+nodo2 <- list(eval = 3, cost = 2)
+nodo3 <- list(eval = 2, cost = 2)
+nodo4 <- list(eval = 4, cost = 2)
+
+successor_nodes <- list(nodo1, nodo2, nodo3, nodo4)
+
+successor_nodes <- successor_nodes[successor_nodes$eval > 2]
+successor_nodes <- append(successor_nodes, list(nodo2))
+successor_nodes
