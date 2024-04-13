@@ -55,13 +55,13 @@ stochastic.hill.climbing = function(problem,
     
     successor_nodes <- filtered_nodes
     
-    # Select random successor
-    node_best_successor <- successor_nodes[[sample(1:length(successor_nodes), 1)]]
-    
     # The best successor is better than current node
-    if (node_best_successor$evaluation <= node_current$evaluation) {
+    if (length(successor_nodes) > 0) {
+      # Select random successor
+      node_random_successor <- successor_nodes[[sample(1:length(successor_nodes), 1)]]
+      
       # Current node is updated
-      node_current <- node_best_successor
+      node_current <- node_random_successor
       
       #If "trace" is on, the information of the new current node is displayed
       if (trace){
