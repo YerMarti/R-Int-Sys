@@ -29,13 +29,14 @@ random.restart.hill.climbing = function(problem,
   # Create result container
   best_result <- 0
   
-  count <- 1
-  end_reason <- 0
+  #Initialization of information for further analysis
+  report <- data.frame(iteration = numeric(),
+                       depth_of_expanded = numeric())
   
   # Loop for restarts
-  for (restart in restarts){
+  for (restart in 1:length(restarts)) {
     
-    restart_result <- hill.climbing(problem = problem, 
+    restart_result <- hill.climbing.search(problem = problem, 
                                     max_iterations = max_iterations, 
                                     count_print = count_print, 
                                     trace = trace)
@@ -53,10 +54,10 @@ random.restart.hill.climbing = function(problem,
   result$name    <- name_method
   result$runtime <- end_time - start_time
   
-  print(paste0("Final State: ", to.string(state = best_result$state, problem = problem)), quote = FALSE)
+  print(paste0("Final State: ", to.string(state = best_result$state_final$state, problem = problem)), quote = FALSE)
   
-  result$state_final <- best_result
-  result$report      <- report
+  result$state_final <- best_result$state_final
+  result$report      <- best_result$report
   print(paste0("* END: ", name_method), quote = F)
   
   return(result)

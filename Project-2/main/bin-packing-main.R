@@ -13,6 +13,7 @@ library(magrittr)
 source("../algorithms/blind/expand-node.R")
 source("../algorithms/informed/hill-climbing-search.R")
 source("../algorithms/informed/stochastic-hill-climbing.R")
+source("../algorithms/informed/random-restart-hill-climbing.R")
 
 # Include functions for data analysis and result plot
 source("../algorithms/results-analysis/analyze-results.R")
@@ -33,11 +34,18 @@ execute.stochastic.hill.climbing <- function(filename) {
   return(stochastic.hill.climbing(problem = problem))
 }
 
+execute.random.restart.hill.climbing <- function(filename) {
+  # Initialize problem
+  problem <- initialize.problem(filename = filename)
+  return(random.restart.hill.climbing(problem = problem))
+}
+
 # Chooses what algorithm to execute
 choose.algorithm <- function(algorithm) {
   switch(algorithm,
          "hill.climbing" = execute.hill.climbing,
          "stochastic.hill.climbing" = execute.stochastic.hill.climbing,
+         "random.restart.hill.climbing" = execute.random.restart.hill.climbing,
          NULL)
 }
 
@@ -84,6 +92,7 @@ graphics.off()
 algorithms    <- vector(mode = "list")
 algorithms[1] <- "hill.climbing"
 algorithms[2] <- "stochastic.hill.climbing"
+algorithms[3] <- "random.restart.hill.climbing"
 
 filenames     <- vector(mode = "list")
 filenames[1]  <- "../data/bin-packing/bin-packing-5.txt"
