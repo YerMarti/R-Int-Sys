@@ -14,6 +14,7 @@ source("../algorithms/blind/expand-node.R")
 source("../algorithms/informed/hill-climbing-search.R")
 source("../algorithms/informed/stochastic-hill-climbing.R")
 source("../algorithms/informed/random-restart-hill-climbing.R")
+source("../algorithms/informed/stochastic-random-restart.R")
 
 # Include functions for data analysis and result plot
 source("../algorithms/results-analysis/analyze-results.R")
@@ -40,12 +41,19 @@ execute.random.restart.hill.climbing <- function(filename) {
   return(random.restart.hill.climbing(problem = problem))
 }
 
+execute.stochastic.random.restart <- function(filename) {
+  # Initialize problem
+  problem <- initialize.problem(filename = filename)
+  return(stochastic.random.restart(problem = problem))
+}
+
 # Chooses what algorithm to execute
 choose.algorithm <- function(algorithm) {
   switch(algorithm,
          "hill.climbing" = execute.hill.climbing,
          "stochastic.hill.climbing" = execute.stochastic.hill.climbing,
          "random.restart.hill.climbing" = execute.random.restart.hill.climbing,
+         "stochastic.random.restart" = execute.stochastic.random.restart,
          NULL)
 }
 
@@ -93,6 +101,7 @@ algorithms    <- vector(mode = "list")
 algorithms[1] <- "hill.climbing"
 algorithms[2] <- "stochastic.hill.climbing"
 algorithms[3] <- "random.restart.hill.climbing"
+algorithms[4] <- "stochastic.random.restart"
 
 filenames     <- vector(mode = "list")
 filenames[1]  <- "../data/bin-packing/bin-packing-5.txt"
