@@ -15,6 +15,7 @@ source("../algorithms/informed/hill-climbing-search.R")
 source("../algorithms/informed/stochastic-hill-climbing.R")
 source("../algorithms/informed/random-restart-hill-climbing.R")
 source("../algorithms/informed/stochastic-random-restart.R")
+source("../algorithms/informed/local-beam-search.R")
 
 # Include functions for data analysis and result plot
 source("../algorithms/results-analysis/analyze-results.R")
@@ -47,6 +48,12 @@ execute.stochastic.random.restart <- function(filename) {
   return(stochastic.random.restart(problem = problem))
 }
 
+execute.local.beam.search <- function(filename) {
+  # Initialize problem
+  problem <- initialize.problem(filename = filename)
+  return(local.beam.search(problem = problem))
+}
+
 # Chooses what algorithm to execute
 choose.algorithm <- function(algorithm) {
   switch(algorithm,
@@ -54,6 +61,7 @@ choose.algorithm <- function(algorithm) {
          "stochastic.hill.climbing" = execute.stochastic.hill.climbing,
          "random.restart.hill.climbing" = execute.random.restart.hill.climbing,
          "stochastic.random.restart" = execute.stochastic.random.restart,
+         "local.beam.search" = execute.local.beam.search,
          NULL)
 }
 
@@ -102,6 +110,7 @@ algorithms[1] <- "hill.climbing"
 algorithms[2] <- "stochastic.hill.climbing"
 algorithms[3] <- "random.restart.hill.climbing"
 algorithms[4] <- "stochastic.random.restart"
+algorithms[5] <- "local.beam.search"
 
 filenames     <- vector(mode = "list")
 filenames[1]  <- "../data/bin-packing/bin-packing-5.txt"
