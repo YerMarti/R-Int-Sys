@@ -233,3 +233,13 @@ successor_nodes <- list(nodo1, nodo2, nodo3, nodo4)
 successor_nodes <- successor_nodes[successor_nodes$eval > 2]
 successor_nodes <- append(successor_nodes, list(nodo2))
 successor_nodes
+
+
+data_frame = data.frame( 
+  col1 = c(1:6), 
+  col2 = c(7:12), 
+  col3 = c(13:24))
+
+for (i in 1:ncol(data_frame)) {
+  print(data_frame[[i]])
+}
