@@ -51,21 +51,21 @@ data <- data[!(data$Profession=="" | data$Ever_Married=="" | data$Graduated=="" 
 data_test <- data_test[!(data_test$Profession=="" | data_test$Ever_Married=="" | data_test$Graduated=="" | data_test$Var_1==""), ]
 
 # Zona de visualizacion o analisis lo que sea
-ggplot(data, aes(x=Age, y=Segmentation)) + geom_point()
-ggplot(data, aes(x=Work_Experience, y=Segmentation)) + geom_point()
-ggplot(data, aes(x=Family_Size, y=Segmentation)) + geom_point()
-
-ggplot(data, aes(x=Age, fill=Age)) + geom_bar() + 
-  geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-  labs(x = "Age", y = "Frequency")
-
-ggplot(data, aes(x=Work_Experience, fill=Work_Experience)) + geom_bar() + 
-  geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-  labs(x = "Work_Experience", y = "Frequency")
-
-ggplot(data, aes(x=Family_Size, fill=Family_Size)) + geom_bar() + 
-  geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-  labs(x = "Family_Size", y = "Frequency")
+# ggplot(data, aes(x=Age, y=Segmentation)) + geom_point()
+# ggplot(data, aes(x=Work_Experience, y=Segmentation)) + geom_point()
+# ggplot(data, aes(x=Family_Size, y=Segmentation)) + geom_point()
+# 
+# ggplot(data, aes(x=Age, fill=Age)) + geom_bar() + 
+#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
+#   labs(x = "Age", y = "Frequency")
+# 
+# ggplot(data, aes(x=Work_Experience, fill=Work_Experience)) + geom_bar() + 
+#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
+#   labs(x = "Work_Experience", y = "Frequency")
+# 
+# ggplot(data, aes(x=Family_Size, fill=Family_Size)) + geom_bar() + 
+#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
+#   labs(x = "Family_Size", y = "Frequency")
 
 
 #------------------------
@@ -85,47 +85,76 @@ plot.data.distribution(data, target = "Segmentation", folder=images_folder)
 # data$Age <- cut(data$Age, breaks = 4, labels = labels)
 # data_test$Age <- cut(data_test$Age, breaks = 4, labels = labels)
 
+# Create 4 bims for Age (based on quartiles)
 data_ordenada <- arrange(data, Age)
 cuartiles <- quantile(data_ordenada$Age, probs = c(0.25, 0.5, 0.75))
-data$Age <- cut(data$Age, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
-data_test_ordenada <- arrange(data_test, Age)
-cuartiles <- quantile(data_test_ordenada$Age, probs = c(0.25, 0.5, 0.75))
-data_test$Age <- cut(data_test$Age, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
+min_age <- min(data_ordenada$Age)
+max_age <- max(data_ordenada$Age)
+data$Age <- cut(data$Age, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_age, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_age)
+))
+data_test$Age <- cut(data_test$Age, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_age, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_age)
+))
 
 
-
-# Create 4 bims for Work_Experience
+# Create 4 bims for Work_Experience (based on lowest and highest values)
 # bin_width <- round((max(data$Work_Experience) - min(data$Work_Experience)) / 4)
 # labels <- paste0(min(data$Work_Experience) + (1:4 - 1) * bin_width, " <-> ", min(data$Work_Experience) + 1:4 * bin_width)
 # data$Work_Experience <- cut(data$Work_Experience, breaks = 4, labels = labels)
 # data_test$Work_Experience <- cut(data_test$Work_Experience, breaks = 4, labels = labels)
 
+# Create 4 bims for Work_Experience (based on quartiles)
 data_ordenada <- arrange(data, Work_Experience)
 cuartiles <- quantile(data_ordenada$Work_Experience, probs = c(0.25, 0.5, 0.75))
-data$Work_Experience <- cut(data$Work_Experience, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
-data_test_ordenada <- arrange(data_test, Work_Experience)
-cuartiles <- quantile(data_test_ordenada$Work_Experience, probs = c(0.25, 0.5, 0.75))
-data_test$Work_Experience <- cut(data_test$Work_Experience, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
+min_exp <- min(data_ordenada$Work_Experience)
+max_exp <- max(data_ordenada$Work_Experience)
+data$Work_Experience <- cut(data$Work_Experience, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_exp, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_exp)
+))
+data_test$Work_Experience <- cut(data_test$Work_Experience, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_exp, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_exp)
+))
 
 
-# Create 4 bims for Family_Size
+# Create 4 bims for Family_Size (based on lowest and highest values)
 # bin_width <- round((max(data$Family_Size) - min(data$Family_Size)) / 4)
 # labels <- paste0(min(data$Family_Size) + (1:4 - 1) * bin_width, " <-> ", min(data$Family_Size) + 1:4 * bin_width)
 # data$Family_Size <- cut(data$Family_Size, breaks = 4, labels = labels)
 # data_test$Family_Size <- cut(data_test$Family_Size, breaks = 4, labels = labels)
 
+# Create 4 bims for Family_Size (based on quartiles)
 data_ordenada <- arrange(data, Family_Size)
 cuartiles <- quantile(data_ordenada$Family_Size, probs = c(0.25, 0.5, 0.75))
 
 cuartiles[2] <- cuartiles[2] + 1
+min_fam <- min(data_ordenada$Family_Size)
+max_fam <- max(data_ordenada$Family_Size)
 
-data$Family_Size <- cut(data$Family_Size, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
-data_test_ordenada <- arrange(data_test, Family_Size)
-cuartiles <- quantile(data_test_ordenada$Family_Size, probs = c(0.25, 0.5, 0.75))
-
-cuartiles[2] <- cuartiles[2] + 1
-
-data_test$Family_Size <- cut(data_test$Family_Size, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c("Q1", "Q2", "Q3", "Q4"))
+data$Family_Size <- cut(data$Family_Size, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_fam, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_fam)
+))
+data_test$Family_Size <- cut(data_test$Family_Size, breaks = c(-Inf, cuartiles[1], cuartiles[2], cuartiles[3], Inf), labels = c(
+  paste0(min_fam, " <-> ", cuartiles[1]),
+  paste0(cuartiles[1], " <-> ", cuartiles[2]),
+  paste0(cuartiles[2]+1, " <-> ", cuartiles[3]),
+  paste0(cuartiles[3]+1, " <-> ", max_fam)
+))
 
 
 #---------------------
