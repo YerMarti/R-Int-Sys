@@ -45,6 +45,36 @@ public class Controller {
 		 * 
 		 * DO NOT MODIFY EITHER THE CUSTOMER CLASS OR THE GUI.
 		 */
+		if (profession == Profession.ARTIST && spendingScore == SpendingScore.LOW && age <= 41) {
+			return Segmentation.A;
+		}
+
+		if ((profession == Profession.DOCTOR || profession == Profession.ENGINEER || profession == Profession.ENTERTAINMENT || profession == Profession.EXECUTIVE || profession == Profession.LAWYER || profession == Profession.HOMEMAKER)
+		 && spendingScore == SpendingScore.LOW && age >= 31 && age <= 89) {
+			return Segmentation.A;
+		}
+
+		if ((profession == Profession.DOCTOR || profession == Profession.ENGINEER || profession == Profession.ENTERTAINMENT || profession == Profession.EXECUTIVE || profession == Profession.LAWYER || profession == Profession.HOMEMAKER)
+		 && (spendingScore == SpendingScore.AVERAGE || spendingScore == SpendingScore.HIGH)) {
+			return Segmentation.B;
+		}
+
+		if (profession == Profession.ARTIST && spendingScore == SpendingScore.LOW && age >= 42 && age <= 89) {
+			return Segmentation.B;
+		}
+
+		if (profession == Profession.ARTIST && (spendingScore == SpendingScore.AVERAGE || spendingScore == SpendingScore.HIGH)) {
+			return Segmentation.C;
+		}
+
+		if ((profession == Profession.DOCTOR || profession == Profession.ENGINEER || profession == Profession.ENTERTAINMENT || profession == Profession.EXECUTIVE || profession == Profession.LAWYER || profession == Profession.HOMEMAKER)
+		 && spendingScore == SpendingScore.LOW && age >= 18 && age <= 31) {
+			return Segmentation.D;
+		}
+
+		if (profession == Profession.HEALTHCARE || profession == Profession.MARKETING) {
+			return Segmentation.D;
+		}
 		
 		return null;
 	}
