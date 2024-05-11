@@ -51,21 +51,21 @@ data <- data[!(data$Profession=="" | data$Ever_Married=="" | data$Graduated=="" 
 data_test <- data_test[!(data_test$Profession=="" | data_test$Ever_Married=="" | data_test$Graduated=="" | data_test$Var_1==""), ]
 
 # Zona de visualizacion o analisis lo que sea
-# ggplot(data, aes(x=Age, y=Segmentation)) + geom_point()
-# ggplot(data, aes(x=Work_Experience, y=Segmentation)) + geom_point()
-# ggplot(data, aes(x=Family_Size, y=Segmentation)) + geom_point()
-# 
-# ggplot(data, aes(x=Age, fill=Age)) + geom_bar() + 
-#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-#   labs(x = "Age", y = "Frequency")
-# 
-# ggplot(data, aes(x=Work_Experience, fill=Work_Experience)) + geom_bar() + 
-#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-#   labs(x = "Work_Experience", y = "Frequency")
-# 
-# ggplot(data, aes(x=Family_Size, fill=Family_Size)) + geom_bar() + 
-#   geom_text(stat="count", aes(label=..count..), vjust=-0.25) + 
-#   labs(x = "Family_Size", y = "Frequency")
+ggplot(data, aes(x=Age, y=Segmentation)) + geom_point()
+ggplot(data, aes(x=Work_Experience, y=Segmentation)) + geom_point()
+ggplot(data, aes(x=Family_Size, y=Segmentation)) + geom_point()
+
+ggplot(data, aes(x=Age, fill=Age)) + geom_bar() +
+  geom_text(stat="count", aes(label=..count..), vjust=-0.25) +
+  labs(x = "Age", y = "Frequency")
+
+ggplot(data, aes(x=Work_Experience, fill=Work_Experience)) + geom_bar() +
+  geom_text(stat="count", aes(label=..count..), vjust=-0.25) +
+  labs(x = "Work_Experience", y = "Frequency")
+
+ggplot(data, aes(x=Family_Size, fill=Family_Size)) + geom_bar() +
+  geom_text(stat="count", aes(label=..count..), vjust=-0.25) +
+  labs(x = "Family_Size", y = "Frequency")
 
 
 #------------------------
@@ -232,6 +232,8 @@ rpart.rules(best_model,
 # ANSWER THEORETICAL QUESTIONS
 #------------------------------
 
+prediction_best <- predict(best_model, data, type = "class")
+
 # Obtén la información de las personas cuya categoría cambie si se modifican sus 
 # estudios superiores a “yes” (incluye tanto la categoría previa como la nueva).
 
@@ -240,8 +242,8 @@ data_new_studies$Graduated <- "Yes"
 prediction_new_studies <- predict(best_model, data_new_studies, type = "class")
 
 results_new_studies <- data.frame(
-  ID = data_new_studies$ID,
-  Previous_Segmentation = data$Segmentation,
+  ID = data$ID,
+  Previous_Segmentation = prediction_best,
   New_Segmentation = prediction_new_studies
 )
 
@@ -257,7 +259,7 @@ prediction_new_married <- predict(best_model, data_new_married, type = "class")
 
 results_new_married <- data.frame(
   ID = data_new_married$ID,
-  Previous_Segmentation = data$Segmentation,
+  Previous_Segmentation = prediction_best,
   New_Segmentation = prediction_new_married
 )
 
