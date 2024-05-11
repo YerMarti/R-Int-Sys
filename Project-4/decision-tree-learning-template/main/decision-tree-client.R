@@ -232,17 +232,17 @@ rpart.rules(best_model,
 # ANSWER THEORETICAL QUESTIONS
 #------------------------------
 
-prediction_best <- predict(best_model, data, type = "class")
+prediction_best <- predict(best_model, data_test, type = "class")
 
 # Obtén la información de las personas cuya categoría cambie si se modifican sus 
 # estudios superiores a “yes” (incluye tanto la categoría previa como la nueva).
 
-data_new_studies <- data
+data_new_studies <- data_test
 data_new_studies$Graduated <- "Yes"
 prediction_new_studies <- predict(best_model, data_new_studies, type = "class")
 
 results_new_studies <- data.frame(
-  ID = data$ID,
+  ID = data_new_studies$ID,
   Previous_Segmentation = prediction_best,
   New_Segmentation = prediction_new_studies
 )
@@ -253,7 +253,7 @@ results_new_studies <- results_new_studies[results_new_studies$Previous_Segmenta
 # Obtén la información de las personas cuya categoría cambie si se modifica su 
 # estado matrimonial a “yes” (incluye tanto la categoría previa como la nueva).
 
-data_new_married <- data
+data_new_married <- data_test
 data_new_married$Ever_Married <- "Yes"
 prediction_new_married <- predict(best_model, data_new_married, type = "class")
 
@@ -265,3 +265,4 @@ results_new_married <- data.frame(
 
 # Filtrar filas donde Previous_Segmentation != New_Segmentation
 results_new_married <- results_new_married[results_new_married$Previous_Segmentation != results_new_married$New_Segmentation, ]
+
